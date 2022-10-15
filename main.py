@@ -51,6 +51,7 @@ wea, temperature = get_weather()
 data = {"weather":{"value":wea},"temperature":{"value":temperature},"love_days":{"value":get_count()},"birthday_left":{"value":get_birthday()},"words":{"value":get_words(), "color":get_random_color()}}
 print('-------------------')
 print(user_id)
+print('o1FJn65IRPSqMx9vZGHsiFxTi8Zs')
 print(template_id)
 print(app_id)
 print(app_secret)

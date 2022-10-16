@@ -19,49 +19,91 @@ template_id = os.environ["TEMPLATE_ID"]
 
 
 def get_weather():
-  url = "http://autodev.openspeech.cn/csp/api/v2.1/weather?openId=aiuicus&clientType=android&sign=android&city=" + city
-  res = requests.get(url).json()
-  weather = res['data']['list'][0]
-  return weather['weather'], math.floor(weather['temp']), weather['humidity'], weather['wind'], weather['airQuality'], math.floor(weather['pm25']), math.floor(weather['high']), math.floor(weather['low']), weather['date'], weather['city']
+    url = "http://autodev.openspeech.cn/csp/api/v2.1/weather?openId=aiuicus&clientType=android&sign=android&city=" + city
+    res = requests.get(url).json()
+    weather = res['data']['list'][0]
+    print(weather)
+    return weather['weather'], math.floor(weather['temp']), weather['humidity'], weather['wind'], weather['airQuality'], math.floor(weather['pm25']), math.floor(weather['high']), math.floor(weather['low']), weather['date'], weather['city']
+
 
 def get_count():
-  delta = today - datetime.strptime(start_date, "%Y-%m-%d")
-  return delta.days
+    delta = today - datetime.strptime(start_date, "%Y-%m-%d")
+    return delta.days
+
 
 def get_birthday():
-  next = datetime.strptime(str(date.today().year) + "-" + birthday, "%Y-%m-%d")
-  if next < datetime.now():
-    next = next.replace(year=next.year + 1)
-  return (next - today).days
+    next = datetime.strptime(str(date.today().year) +
+                             "-" + birthday, "%Y-%m-%d")
+    if next < datetime.now():
+        next = next.replace(year=next.year + 1)
+    return (next - today).days
+
 
 def get_words():
-  words = requests.get("https://api.shadiao.pro/chp")
-  if words.status_code != 200:
-    return get_words()
-  return words.json()['data']['text']
+    words = requests.get("https://api.shadiao.pro/chp")
+    if words.status_code != 200:
+        return get_words()
+    return words.json()['data']['text']
+
 
 def get_random_color():
-  return "#%06x" % random.randint(0, 0xFFFFFF)
+    return "#%06x" % random.randint(0, 0xFFFFFF)
+
+
+def get_week():
+    week_list = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
+    return week_list[datetime.now().weekday()]
 
 
 client = WeChatClient(app_id, app_secret)
 
 wm = WeChatMessage(client)
-wea, temperature, humidity, wind, airQuality, pm25, high, low, cur_date, city  = get_weather()
+wea, temperature, humidity, wind, airQuality, pm25, high, low, cur_date, city = get_weather()
 data = {
-  "weather":{"value":wea},
-  "temperature":{"value": temperature},
-  "humidity": {"value": humidity, "color":get_random_color()},
-  "wind": {"value": wind, "color":get_random_color()},
-  "airQuality": {"value": airQuality, "color":get_random_color()},
-  "pm25": {"value": pm25, "color":get_random_color()},
-  "high": {"value": high},
-  "low": {"value": low},
-  "city": {"value": city},
-  "cur_date": {"value": cur_date},
-  "love_days":{"value":get_count(), "color":get_random_color()},
-  "birthday_left":{"value":get_birthday(), "color":get_random_color()},
-  "words":{"value":get_words(), "color":get_random_color()}
-  }
+    "weather": {
+        "value": wea
+    },
+    "temperature": {
+        "value": temperature
+    },
+    "humidity": {
+        "value": humidity
+    },
+    "wind": {
+        "value": wind
+    },
+    "airQuality": {
+        "value": airQuality
+    },
+    "pm25": {
+        "value": pm25
+    },
+    "high": {
+        "value": high
+    },
+    "low": {
+        "value": low
+    },
+    "city": {
+        "value": city
+    },
+    "cur_date": {
+        "value": cur_date
+    },
+    "cur_week": {
+        "value": get_week()
+    },
+    "love_days": {
+        "value": get_count()
+    },
+    "birthday_left": {
+        "value": get_birthday()
+    },
+    "words": {
+        "value": get_words(),
+        "color": get_random_color()
+    }
+}
+
 res = wm.send_template(user_id, template_id, data)
 print(res)
